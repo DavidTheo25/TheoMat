@@ -14,7 +14,7 @@ TEST(General, copy_ctor){
     Theo::CTheoMat b(a);
 //    Theo::CTheoMat c(n, m);
 
-    auto c = a + b;
+    Theo::CTheoMat c(a + b);
 
     std::cout << a.toString() << std::endl;
     std::cout << b.toString() << std::endl;

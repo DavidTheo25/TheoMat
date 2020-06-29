@@ -11,7 +11,8 @@ namespace Theo {
     public:
         CTheoMat() = delete;
         CTheoMat(int n, int m);
-        CTheoMat(CTheoMat& matrix);
+        CTheoMat(const CTheoMat& matrix);
+
         void hello();
         ~CTheoMat();
         double getValue(int i, int j) const;

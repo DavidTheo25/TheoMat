@@ -16,7 +16,7 @@ double** Theo::CTheoMat::initMat() {
 
 Theo::CTheoMat::CTheoMat(int _n, int _m): n(_n), m(_m), mat(initMat()) {}
 
-Theo::CTheoMat::CTheoMat(Theo::CTheoMat& matrix): n(matrix.getN()), m(matrix.getM()), mat(initMat()) {
+Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): n(matrix.getN()), m(matrix.getM()), mat(initMat()) {
     // deep copy, maybe not the best way to do it
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
@@ -24,6 +24,7 @@ Theo::CTheoMat::CTheoMat(Theo::CTheoMat& matrix): n(matrix.getN()), m(matrix.get
         }
     }
 }
+
 
 Theo::CTheoMat::~CTheoMat() {
     for (int i = 0; i < n; i++){
