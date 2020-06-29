@@ -41,3 +41,7 @@ endif()
 add_executable(helloTest test/Thello.cpp)
 target_link_libraries(helloTest gtest_main theoMat)
 add_test(NAME helloTest COMMAND tests/Thello.cpp)
+
+add_executable(operationTest test/Toperations.cpp)
+target_link_libraries(operationTest gtest_main theoMat)
+add_test(NAME operationTest COMMAND tests/Toperations.cpp)

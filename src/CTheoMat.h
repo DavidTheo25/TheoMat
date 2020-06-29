@@ -2,6 +2,8 @@
 #define THEOMAT_CTHEOMAT_H
 
 #include <vector>
+#include <string>
+
 
 namespace Theo {
 
@@ -12,12 +14,20 @@ namespace Theo {
         CTheoMat(CTheoMat& matrix);
         void hello();
         ~CTheoMat();
+        double getValue(int i, int j) const;
+        void setValue(double value, int i, int j);
+        int getN() const;
+        int getM() const;
+        std::string toString();
+
+        CTheoMat operator+(const CTheoMat& matrix);
 
 
     private:
         int n, m;
         double** mat;
-//        std::vector<std::vector<double>> mat;
+
+        double** initMat();
     };
 
 }
