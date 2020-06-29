@@ -22,6 +22,7 @@ namespace Theo {
         std::string toString();
 
         CTheoMat operator+(const CTheoMat& matrix);
+        CTheoMat operator-(const CTheoMat& matrix);
 
 
     private:

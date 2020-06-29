@@ -66,8 +66,17 @@ Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
     CTheoMat result(n, m);
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            auto temp = matrix.getValue(i, j);
-            result.setValue(temp + mat[i][j], i,j);
+            result.setValue(matrix.getValue(i, j) + mat[i][j], i,j);
+        }
+    }
+    return result;
+}
+
+Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
+    CTheoMat result(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            result.setValue(matrix.getValue(i, j) - mat[i][j], i,j);
         }
     }
     return result;
