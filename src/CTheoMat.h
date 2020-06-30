@@ -9,10 +9,12 @@ namespace Theo {
 
     class CTheoMat {
     public:
-        CTheoMat() = delete;
+        CTheoMat();
         CTheoMat(int n, int m);
         CTheoMat(const CTheoMat& matrix);
         ~CTheoMat();
+
+        static CTheoMat identity(int n);
 
         void hello();
         double getValue(int i, int j) const;
@@ -21,19 +23,24 @@ namespace Theo {
         int getM() const;
         std::string toString();
         CTheoMat transpose();
-
         bool checkDim(const CTheoMat& matrix) const;
 
+        CTheoMat & operator=(const CTheoMat& matrix);
         CTheoMat operator+(const CTheoMat& matrix);
         CTheoMat operator-(const CTheoMat& matrix);
+        CTheoMat operator*(const CTheoMat& matrix) const;
+        CTheoMat operator*(double k) const;
         double& operator()(int i, int j);
+        double& operator()(int& i, int& j) const;
+        bool operator==(const CTheoMat& matrix) const;
 
 
     private:
         int n, m;
         double** mat;
 
-        double** initMat();
+        double** initMat() const;
+        void freeMat();
     };
 
 }

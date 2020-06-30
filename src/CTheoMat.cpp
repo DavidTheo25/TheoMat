@@ -6,13 +6,18 @@ void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library" << std::endl;
 }
 
-double** Theo::CTheoMat::initMat() {
+double** Theo::CTheoMat::initMat() const {
     auto matTemp = new double*[n];
     for (int i = 0; i < n; i++){
         matTemp[i] = new double[m];
+        for(int j = 0; j < m; j++){
+            matTemp[i][j] = 0;
+        }
     }
     return matTemp;
 }
+
+Theo::CTheoMat::CTheoMat(): n(0), m(0), mat(initMat()) {}
 
 Theo::CTheoMat::CTheoMat(int _n, int _m): n(_n), m(_m), mat(initMat()) {}
 
@@ -25,20 +30,22 @@ Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): n(matrix.getN()), m(matr
     }
 }
 
-
-Theo::CTheoMat::~CTheoMat() {
+void Theo::CTheoMat::freeMat() {
     for (int i = 0; i < n; i++){
         delete[] mat[i];
     }
     delete [] mat;
 }
 
+Theo::CTheoMat::~CTheoMat() {
+    freeMat();
+}
+
 double Theo::CTheoMat::getValue(int i, int j) const {
-    // TODO throw excpetion
     if(i >= 0 && i < n && j >= 0 && j < m) {
         return (double) mat[i][j];
     }
-    return 0;
+    throw std::out_of_range("i and/or j out of matrix range");
 }
 
 void Theo::CTheoMat::setValue(double value, int i, int j) {
@@ -68,6 +75,21 @@ std::string Theo::CTheoMat::toString() {
 
 bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) const {
     return n == matrix.getN() && m == matrix.getM();
+}
+
+Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
+    if(this != &matrix){
+        n = matrix.getN();
+        m = matrix.getM();
+        freeMat();
+        initMat();
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                mat[i][j] = matrix.getValue(i, j);
+            }
+        }
+    }
+    return *this;
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
@@ -102,6 +124,62 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
     throw std::out_of_range(errorMessage);
 }
 
+Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
+    if(m == matrix.getN()) {
+        CTheoMat result(n, matrix.getM());
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < matrix.getM(); j++) {
+                for(int k = 0; k < m; k++){
+                    result(i, j) += mat[i][k] * matrix.getValue(k, j);
+                }
+            }
+        }
+        return result;
+    }
+    std::string errorMessage = "cannot multiply incompatible matrices. first one has " + std::to_string(m) +
+            " columns while second one has " + std::to_string(matrix.getN()) + " rows \n";
+    throw std::out_of_range(errorMessage);
+
+}
+
+Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
+    CTheoMat result(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            result(i,j) = mat[i][j] * k;
+        }
+    }
+    return result;
+}
+
+double &Theo::CTheoMat::operator()(int i, int j) {
+    if(i >= 0 && i < n && j >= 0 && j < m) {
+        return mat[i][j];
+    }
+    throw std::out_of_range("i or j is out of the matrix range");
+}
+
+double &Theo::CTheoMat::operator()(int &i, int &j) const {
+    if(i >= 0 && i < n && j >= 0 && j < m) {
+        return mat[i][j];
+    }
+    throw std::out_of_range("i or j is out of the matrix range");
+}
+
+bool Theo::CTheoMat::operator==(const Theo::CTheoMat &matrix) const {
+    if(n != matrix.getN() || m != matrix.getM()){
+        return false;
+    }
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(mat[i][j] != matrix(i, j)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 Theo::CTheoMat Theo::CTheoMat::transpose() {
     CTheoMat transpose(m, n);
     for(int i = 0; i < n; i++){
@@ -112,9 +190,10 @@ Theo::CTheoMat Theo::CTheoMat::transpose() {
     return transpose;
 }
 
-double &Theo::CTheoMat::operator()(int i, int j) {
-    if(i >= 0 && i < n && j >= 0 && j < m) {
-        return mat[i][j];
+Theo::CTheoMat Theo::CTheoMat::identity(int size) {
+    CTheoMat id(size, size);
+    for(int i = 0; i < size; i++){
+        id(i, i) = 1;
     }
-    throw std::out_of_range("i or j is out of the matrix range");
+    return id;
 }

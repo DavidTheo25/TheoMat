@@ -13,11 +13,11 @@ TEST(Operations, add_operator){
 
     Theo::CTheoMat b(a);
 
-    Theo::CTheoMat c(a + b);
+    auto c = a + b;
 
-    std::cout << a.toString() << std::endl;
-    std::cout << b.toString() << std::endl;
-    std::cout << c.toString() << std::endl;
+//    std::cout << a.toString() << std::endl;
+//    std::cout << b.toString() << std::endl;
+//    std::cout << c.toString() << std::endl;
 
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
@@ -38,11 +38,11 @@ TEST(Operations, sub_operator){
 
     Theo::CTheoMat b(a);
 
-    Theo::CTheoMat c(a - b);
+    auto c = b - a;
 
-    std::cout << a.toString() << std::endl;
-    std::cout << b.toString() << std::endl;
-    std::cout << c.toString() << std::endl;
+//    std::cout << a.toString() << std::endl;
+//    std::cout << b.toString() << std::endl;
+//    std::cout << c.toString() << std::endl;
 
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
@@ -57,7 +57,7 @@ TEST(Operations, transpose){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            a.setValue((double) i+j, i, j);
+            a(i, j) = (double) i + j;
         }
     }
 
@@ -69,7 +69,69 @@ TEST(Operations, transpose){
         }
     }
 
+//    std::cout << a.toString() << std::endl;
+//    std::cout << b.toString() << std::endl;
+}
+
+TEST(Operations, multKOperator){
+    int n = 2;
+    int m = 3;
+    Theo::CTheoMat a(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            a(i, j) = (double) i + j;
+        }
+    }
+
+    double k = 2.8;
+
+    auto b = a * k;
+
+//    std::cout << a.toString() << std::endl;
+//    std::cout << b.toString() << std::endl;
+
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            ASSERT_EQ(b(i, j), a(i, j) * k);
+        }
+    }
+}
+
+TEST(Operations, multMatOperator_id){
+    int n = 2;
+    int m = 3;
+    Theo::CTheoMat a(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            a(i, j) = (double) i + j;
+        }
+    }
+
+    auto idMat = Theo::CTheoMat::identity(m);
+
+    auto b = a * idMat;
+
+//    std::cout << idMat.toString() << std::endl;
+//    std::cout << a.toString() << std::endl;
+//    std::cout << b.toString() << std::endl;
+
+    ASSERT_TRUE(a == b);
+}
+
+TEST(Operations, multMatOperator){
+    int n = 2;
+    int m = 2;
+    Theo::CTheoMat a(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            a(i, j) = (double) i + j;
+        }
+    }
+
+    auto b = a * a;
+
     std::cout << a.toString() << std::endl;
     std::cout << b.toString() << std::endl;
 
+    ASSERT_TRUE(a == b);
 }
