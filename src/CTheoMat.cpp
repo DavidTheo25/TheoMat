@@ -30,6 +30,24 @@ Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): n(matrix.getN()), m(matr
     }
 }
 
+Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> initList) {
+    n = initList.size();
+    m = initList.begin()->size();
+    mat = initMat();
+    int i = 0, j = 0;
+    for(auto & row : initList) {
+        if(row.size() != m) {
+            throw std::out_of_range("invalid initialisation list size");
+        }
+        for(auto & value : row){
+            mat[i][j] = value;
+            j++;
+        }
+        j = 0;
+        i++;
+    }
+}
+
 void Theo::CTheoMat::freeMat() {
     for (int i = 0; i < n; i++){
         delete[] mat[i];
@@ -196,4 +214,8 @@ Theo::CTheoMat Theo::CTheoMat::identity(int size) {
         id(i, i) = 1;
     }
     return id;
+}
+
+Theo::CTheoMat Theo::operator*(const double k, const Theo::CTheoMat &matrix) {
+    return matrix * k;
 }

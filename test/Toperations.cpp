@@ -85,14 +85,14 @@ TEST(Operations, multKOperator){
 
     double k = 2.8;
 
-    auto b = a * k;
+    auto b =  k * a * k;
 
 //    std::cout << a.toString() << std::endl;
 //    std::cout << b.toString() << std::endl;
 
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            ASSERT_EQ(b(i, j), a(i, j) * k);
+            ASSERT_EQ(b(i, j), a(i, j) * k * k);
         }
     }
 }
@@ -121,17 +121,12 @@ TEST(Operations, multMatOperator_id){
 TEST(Operations, multMatOperator){
     int n = 2;
     int m = 2;
-    Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            a(i, j) = (double) i + j;
-        }
-    }
+    Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
+    Theo::CTheoMat b({{1,2},{0,-1}, {-2,3}});
 
-    auto b = a * a;
+    double k = -1.0;
 
-    std::cout << a.toString() << std::endl;
-    std::cout << b.toString() << std::endl;
+    auto c = a * b;
 
-    ASSERT_TRUE(a == b);
+    ASSERT_TRUE(c == Theo::CTheoMat({{-4, 7}, {-5, 13}}));
 }

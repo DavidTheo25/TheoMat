@@ -46,3 +46,11 @@ TEST(General, copy_ctor){
         }
     }
 }
+
+TEST(General, initializerListCtor){
+    Theo::CTheoMat a({{1,2,3},{3,4,5}});
+    Theo::CTheoMat b(2,3);
+    b(0,0) = 1; b(0, 1) = 2; b(0, 2) = 3;
+    b(1,0) = 3; b(1, 1) = 4; b(1, 2) = 5;
+    ASSERT_TRUE(a == b);
+}
