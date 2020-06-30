@@ -12,14 +12,17 @@ namespace Theo {
         CTheoMat() = delete;
         CTheoMat(int n, int m);
         CTheoMat(const CTheoMat& matrix);
+        ~CTheoMat();
 
         void hello();
-        ~CTheoMat();
         double getValue(int i, int j) const;
         void setValue(double value, int i, int j);
         int getN() const;
         int getM() const;
         std::string toString();
+        CTheoMat transpose();
+
+        bool checkDim(const CTheoMat& matrix);
 
         CTheoMat operator+(const CTheoMat& matrix);
         CTheoMat operator-(const CTheoMat& matrix);

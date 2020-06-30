@@ -12,7 +12,6 @@ TEST(Operations, add_operator){
     }
 
     Theo::CTheoMat b(a);
-//    Theo::CTheoMat c(n, m);
 
     Theo::CTheoMat c(a + b);
 
@@ -38,7 +37,6 @@ TEST(Operations, sub_operator){
     }
 
     Theo::CTheoMat b(a);
-//    Theo::CTheoMat c(n, m);
 
     Theo::CTheoMat c(a - b);
 
@@ -51,4 +49,21 @@ TEST(Operations, sub_operator){
             ASSERT_EQ(c.getValue(i, j), a.getValue(i, j) - b.getValue(i, j));
         }
     }
+}
+
+TEST(Operations, transpose){
+    int n = 2;
+    int m = 3;
+    Theo::CTheoMat a(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            a.setValue((double) i+j, i, j);
+        }
+    }
+
+    auto b = a.transpose();
+
+    std::cout << a.toString() << std::endl;
+    std::cout << b.toString() << std::endl;
+
 }

@@ -62,14 +62,23 @@ std::string Theo::CTheoMat::toString() {
     return s;
 }
 
+bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) {
+    return n == matrix.getN() && m == matrix.getM();
+}
+
 Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
-    CTheoMat result(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            result.setValue(matrix.getValue(i, j) + mat[i][j], i,j);
+    if(checkDim(matrix)){
+        CTheoMat result(n, m);
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                result.setValue(matrix.getValue(i, j) + mat[i][j], i,j);
+            }
         }
+        return result;
     }
-    return result;
+    std::cerr << "dimensions don't match" << std::endl;
+//    TODO make this throw an exception, same goes for minus op
+    return matrix;
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
@@ -80,4 +89,14 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
         }
     }
     return result;
+}
+
+Theo::CTheoMat Theo::CTheoMat::transpose() {
+    CTheoMat transpose(m, n);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            transpose.setValue(mat[i][j], j, i);
+        }
+    }
+    return transpose;
 }
