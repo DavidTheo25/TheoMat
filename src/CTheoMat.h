@@ -22,10 +22,11 @@ namespace Theo {
         std::string toString();
         CTheoMat transpose();
 
-        bool checkDim(const CTheoMat& matrix);
+        bool checkDim(const CTheoMat& matrix) const;
 
         CTheoMat operator+(const CTheoMat& matrix);
         CTheoMat operator-(const CTheoMat& matrix);
+        double& operator()(int i, int j);
 
 
     private:

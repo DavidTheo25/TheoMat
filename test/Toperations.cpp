@@ -7,7 +7,7 @@ TEST(Operations, add_operator){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            a.setValue((double) i+j, i, j);
+            a(i, j) = (double) i + j;
         }
     }
 
@@ -21,7 +21,7 @@ TEST(Operations, add_operator){
 
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            ASSERT_EQ(c.getValue(i, j), a.getValue(i, j) + b.getValue(i, j));
+            ASSERT_EQ(c(i, j), a(i, j) + b(i, j));
         }
     }
 }
@@ -32,7 +32,7 @@ TEST(Operations, sub_operator){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            a.setValue((double) i+j, i, j);
+            a(i, j) = (double) i + j;
         }
     }
 
@@ -46,7 +46,7 @@ TEST(Operations, sub_operator){
 
     for(int i = 0; i < n; i++){
         for(int j = 0; j < m; j++){
-            ASSERT_EQ(c.getValue(i, j), a.getValue(i, j) - b.getValue(i, j));
+            ASSERT_EQ(c(i, j), a(i, j) - b(i, j));
         }
     }
 }
@@ -62,6 +62,12 @@ TEST(Operations, transpose){
     }
 
     auto b = a.transpose();
+
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            ASSERT_EQ(a(i, j), b(j, i));
+        }
+    }
 
     std::cout << a.toString() << std::endl;
     std::cout << b.toString() << std::endl;

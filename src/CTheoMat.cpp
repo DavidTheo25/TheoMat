@@ -34,7 +34,11 @@ Theo::CTheoMat::~CTheoMat() {
 }
 
 double Theo::CTheoMat::getValue(int i, int j) const {
-    return (double) mat[i][j];
+    // TODO throw excpetion
+    if(i >= 0 && i < n && j >= 0 && j < m) {
+        return (double) mat[i][j];
+    }
+    return 0;
 }
 
 void Theo::CTheoMat::setValue(double value, int i, int j) {
@@ -62,7 +66,7 @@ std::string Theo::CTheoMat::toString() {
     return s;
 }
 
-bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) {
+bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) const {
     return n == matrix.getN() && m == matrix.getM();
 }
 
@@ -76,19 +80,26 @@ Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
         }
         return result;
     }
-    std::cerr << "dimensions don't match" << std::endl;
-//    TODO make this throw an exception, same goes for minus op
-    return matrix;
+    std::string errorMessage = "cannot add matrices of different sizes (" + std::to_string(n) + ", "
+            + std::to_string(m) + ") and (" + std::to_string(matrix.getN()) + ", "
+            + std::to_string(matrix.getM()) + ")\n";
+    throw std::out_of_range(errorMessage);
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
-    CTheoMat result(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            result.setValue(matrix.getValue(i, j) - mat[i][j], i,j);
+    if(checkDim(matrix)) {
+        CTheoMat result(n, m);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                result.setValue(matrix.getValue(i, j) - mat[i][j], i, j);
+            }
         }
+        return result;
     }
-    return result;
+    std::string errorMessage = "cannot subtract matrices of different sizes (" + std::to_string(n) + ", "
+                               + std::to_string(m) + ") and (" + std::to_string(matrix.getN()) + ", "
+                               + std::to_string(matrix.getM()) + ")\n";
+    throw std::out_of_range(errorMessage);
 }
 
 Theo::CTheoMat Theo::CTheoMat::transpose() {
@@ -99,4 +110,11 @@ Theo::CTheoMat Theo::CTheoMat::transpose() {
         }
     }
     return transpose;
+}
+
+double &Theo::CTheoMat::operator()(int i, int j) {
+    if(i >= 0 && i < n && j >= 0 && j < m) {
+        return mat[i][j];
+    }
+    throw std::out_of_range("i or j is out of the matrix range");
 }
