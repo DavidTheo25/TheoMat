@@ -28,6 +28,7 @@ namespace Theo {
 
         CTheoMat & operator=(const CTheoMat& matrix);
         CTheoMat operator+(const CTheoMat& matrix);
+        CTheoMat & operator+=(const CTheoMat& matrix);
         CTheoMat operator-(const CTheoMat& matrix);
         CTheoMat operator*(const CTheoMat& matrix) const;
         CTheoMat operator*(double k) const;

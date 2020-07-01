@@ -126,6 +126,11 @@ Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
     throw std::out_of_range(errorMessage);
 }
 
+Theo::CTheoMat & Theo::CTheoMat::operator+=(const Theo::CTheoMat &matrix) {
+    *this = *this + matrix;
+    return *this;
+}
+
 Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
     if(checkDim(matrix)) {
         CTheoMat result(n, m);
