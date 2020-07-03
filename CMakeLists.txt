@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
-project(theoMat)
+cmake_minimum_required(VERSION 3.1...3.16)
+project(theoMat VERSION 1.0
+                DESCRIPTION "Basic matrix library with few operations"
+                LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
