@@ -3,7 +3,7 @@
 #include <iostream>
 
 void Theo::CTheoMat::hello() {
-    std::cout << "Hello I am the theo's custom matrix library" << std::endl;
+    std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;
 }
 
 double** Theo::CTheoMat::initMat() const {
