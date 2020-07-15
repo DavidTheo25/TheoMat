@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/CTheoMat.h"
+#include "../include/CTheoMat.h"
 
 TEST(Operations, add_operator){
     int n = 2;

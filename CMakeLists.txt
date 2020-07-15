@@ -5,7 +5,8 @@ project(theoMat VERSION 1.0
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_library(theoMat SHARED src/CTheoMat.cpp src/CTheoMat.h)
+add_library(theoMat SHARED src/CTheoMat.cpp include/CTheoMat.h)
+target_include_directories(theoMat PUBLIC include)
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
