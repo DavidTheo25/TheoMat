@@ -13,6 +13,8 @@ namespace Theo {
         CTheoMat(int n, int m);
         CTheoMat(const CTheoMat& matrix);
         CTheoMat(std::initializer_list<std::initializer_list<double>> initList);
+        CTheoMat(std::vector<double> initVect);
+        CTheoMat(double* values, int size);
         ~CTheoMat();
 
         static CTheoMat identity(int n);
@@ -32,6 +34,7 @@ namespace Theo {
         CTheoMat operator-(const CTheoMat& matrix);
         CTheoMat operator*(const CTheoMat& matrix) const;
         CTheoMat operator*(double k) const;
+        CTheoMat operator[](int i);
         friend CTheoMat operator*(const double k, const CTheoMat& matrix);
         double& operator()(int i, int j);
         double& operator()(int& i, int& j) const;

@@ -119,14 +119,18 @@ TEST(Operations, multMatOperator_id){
 }
 
 TEST(Operations, multMatOperator){
-    int n = 2;
-    int m = 2;
     Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
     Theo::CTheoMat b({{1,2},{0,-1}, {-2,3}});
-
-    double k = -1.0;
 
     auto c = a * b;
 
     ASSERT_TRUE(c == Theo::CTheoMat({{-4, 7}, {-5, 13}}));
+}
+
+TEST(Operations, idx){
+    Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
+    std::cout << a.toString() << std::endl;
+    std::cout << a.getM() << std::endl;
+    std::cout << a[1].toString() << std::endl;
+    ASSERT_TRUE(a[1] == Theo::CTheoMat({{1, -2, 3}}));
 }

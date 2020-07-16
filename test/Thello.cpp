@@ -54,3 +54,8 @@ TEST(General, initializerListCtor){
     b(1,0) = 3; b(1, 1) = 4; b(1, 2) = 5;
     ASSERT_TRUE(a == b);
 }
+
+TEST(General, vecCtor){
+    std::vector<double> foo = {0, 1, 2};
+    ASSERT_TRUE(Theo::CTheoMat({0,1,2}) == Theo::CTheoMat({0,1,2}));
+}

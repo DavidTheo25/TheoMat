@@ -48,6 +48,33 @@ Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> in
     }
 }
 
+/**
+ * Creates a one line matrix with the given vector
+ * @param initVect
+ */
+Theo::CTheoMat::CTheoMat(std::vector<double> initVect) {
+    n = 1;
+    m = initVect.size();
+    mat = initMat();
+    int i = 0;
+    for(auto & value : initVect){
+        mat[0][i] = value;
+        i++;
+    }
+}
+
+/**
+ * Creates a matrix with just one line using the given values
+ * @param values
+ * @param size
+ */
+Theo::CTheoMat::CTheoMat(double *values, int size): n(1), m(size), mat(initMat()){
+    for(int i = 0; i < m; i++){
+        mat[0][i] = values[i];
+    }
+}
+
+
 void Theo::CTheoMat::freeMat() {
     for (int i = 0; i < n; i++){
         delete[] mat[i];
@@ -173,6 +200,16 @@ Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
         }
     }
     return result;
+}
+
+/*
+ * returns a copy and not the actual line
+ */
+Theo::CTheoMat Theo::CTheoMat::operator[](int i) {
+    if(i >= n){
+        throw std::out_of_range("line out of matrix range");
+    }
+    return CTheoMat(mat[i], m);
 }
 
 double &Theo::CTheoMat::operator()(int i, int j) {
