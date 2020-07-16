@@ -13,6 +13,7 @@ namespace Theo {
         CTheoMat(int n, int m);
         CTheoMat(const CTheoMat& matrix);
         CTheoMat(std::initializer_list<std::initializer_list<double>> initList);
+        CTheoMat(std::vector<std::vector<double>> initList);
         CTheoMat(std::vector<double> initVect);
         CTheoMat(double* values, int size);
         ~CTheoMat();

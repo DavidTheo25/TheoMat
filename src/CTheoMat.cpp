@@ -48,6 +48,24 @@ Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> in
     }
 }
 
+Theo::CTheoMat::CTheoMat(std::vector<std::vector<double>> initVec) {
+    n = initVec.size();
+    m = initVec.begin()->size();
+    mat = initMat();
+    int i = 0, j = 0;
+    for(auto & row : initVec) {
+        if(row.size() != m) {
+            throw std::out_of_range("invalid initialisation vector size");
+        }
+        for(auto & value : row){
+            mat[i][j] = value;
+            j++;
+        }
+        j = 0;
+        i++;
+    }
+}
+
 /**
  * Creates a one line matrix with the given vector
  * @param initVect
