@@ -142,9 +142,9 @@ bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) const {
 
 Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
     if(this != &matrix){
+        freeMat();
         n = matrix.getN();
         m = matrix.getM();
-        freeMat();
         initMat();
         for(int i = 0; i < n; i++){
             for(int j = 0; j < m; j++){
