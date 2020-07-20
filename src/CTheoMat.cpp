@@ -220,6 +220,16 @@ Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
     return result;
 }
 
+Theo::CTheoMat Theo::CTheoMat::operator/(double k) const {
+    CTheoMat result(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            result(i,j) = mat[i][j] / k;
+        }
+    }
+    return result;
+}
+
 /*
  * returns a copy and not the actual line
  */
