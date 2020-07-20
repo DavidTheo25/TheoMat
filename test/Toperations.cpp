@@ -97,6 +97,31 @@ TEST(Operations, multKOperator){
     }
 }
 
+TEST(Operations, divideOperator){
+    int n = 2;
+    int m = 3;
+    Theo::CTheoMat a(n, m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            a(i, j) = (double) i + j;
+        }
+    }
+
+    double k = 2.8;
+
+    auto b =  a / k;
+
+
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            ASSERT_EQ(b(i, j), a(i, j) / k);
+        }
+    }
+    std::cout << a.toString() << std::endl;
+    a = a / 1.0;
+    std::cout << a.toString() << std::endl;
+}
+
 TEST(Operations, multMatOperator_id){
     int n = 2;
     int m = 3;

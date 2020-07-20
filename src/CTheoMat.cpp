@@ -156,10 +156,11 @@ Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
         freeMat();
         n = matrix.getN();
         m = matrix.getM();
-        initMat();
-        for(int i = 0; i < n; i++){
+        mat = new double*[n];
+        for (int i = 0; i < n; i++){
+            mat[i] = new double[m];
             for(int j = 0; j < m; j++){
-                mat[i][j] = matrix.getValue(i, j);
+                mat[i][j] = matrix(i, j);
             }
         }
     }
