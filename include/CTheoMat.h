@@ -37,7 +37,8 @@ namespace Theo {
         CTheoMat operator*(const CTheoMat& matrix) const;
         CTheoMat operator*(double k) const;
         CTheoMat operator/(double k) const;
-        CTheoMat operator[](int i);
+        double& operator[](int i);
+        double& operator[](int& i) const;
         friend CTheoMat operator*(const double k, const CTheoMat& matrix);
         double& operator()(int i, int j);
         double& operator()(int& i, int& j) const;
@@ -45,10 +46,10 @@ namespace Theo {
 
 
     private:
-        int n, m;
-        double** mat;
+        int rows, columns;
+        double* mat;
 
-        double** initMat() const;
+        double* initMat() const;
         void freeMat();
     };
 

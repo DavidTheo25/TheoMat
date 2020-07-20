@@ -153,14 +153,6 @@ TEST(Operations, multMatOperator){
     ASSERT_TRUE(c == Theo::CTheoMat({{-4, 7}, {-5, 13}}));
 }
 
-TEST(Operations, idx){
-    Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
-//    std::cout << a.toString() << std::endl;
-//    std::cout << a.getM() << std::endl;
-//    std::cout << a[1].toString() << std::endl;
-    ASSERT_TRUE(a[1] == Theo::CTheoMat({{1, -2, 3}}));
-}
-
 TEST(Operations, random){
     Theo::CTheoMat a(4,5);
     a.random();
