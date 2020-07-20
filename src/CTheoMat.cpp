@@ -205,12 +205,13 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
+    // very slow implementation ...
     if(m == matrix.getN()) {
         CTheoMat result(n, matrix.getM());
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < matrix.getM(); j++) {
                 for(int k = 0; k < m; k++){
-                    result(i, j) += mat[i][k] * matrix.getValue(k, j);
+                    result(i, j) += mat[i][k] * matrix(k, j);
                 }
             }
         }

@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "../include/CTheoMat.h"
+#include <chrono>
 
 TEST(Operations, add_operator){
     int n = 2;
@@ -166,4 +167,16 @@ TEST(Operations, random){
     auto b = a;
     a.random();
     ASSERT_FALSE(a == b);
+}
+
+TEST(Operations, bigMatrixMult){
+    Theo::CTheoMat a(400,500);
+    a.random();
+    auto b = a.transpose();
+    auto start = std::chrono::high_resolution_clock::now();
+    auto res = a * b;
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << duration.count() << std::endl;
+
 }
