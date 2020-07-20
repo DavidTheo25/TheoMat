@@ -210,9 +210,11 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
         CTheoMat result(n, matrix.getM());
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < matrix.getM(); j++) {
+                auto s = 0;
                 for(int k = 0; k < m; k++){
-                    result(i, j) += mat[i][k] * matrix(k, j);
+                    s += mat[i][k] * matrix(k, j);
                 }
+                result(i, j) = s;
             }
         }
         return result;
