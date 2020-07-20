@@ -1,6 +1,6 @@
 #include "CTheoMat.h"
-
 #include <iostream>
+#include <random>
 
 void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;
@@ -114,6 +114,17 @@ double Theo::CTheoMat::getValue(int i, int j) const {
 void Theo::CTheoMat::setValue(double value, int i, int j) {
     if(i >= 0 && i < n && j >= 0 && j < m){
         mat[i][j] = value;
+    }
+}
+
+void Theo::CTheoMat::random() {
+    std::random_device r;
+    std::default_random_engine e1(r());
+    std::uniform_real_distribution<double> uniformDist(0,1);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            mat[i][j] = uniformDist(e1);
+        }
     }
 }
 

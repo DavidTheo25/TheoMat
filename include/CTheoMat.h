@@ -23,6 +23,7 @@ namespace Theo {
         void hello();
         double getValue(int i, int j) const;
         void setValue(double value, int i, int j);
+        void random();
         int getN() const;
         int getM() const;
         std::string toString();
