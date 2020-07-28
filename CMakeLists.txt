@@ -3,7 +3,7 @@ project(theoMat VERSION 1.0
                 DESCRIPTION "Basic matrix library with few operations"
                 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 14)
 
 add_library(theoMat SHARED src/CTheoMat.cpp include/CTheoMat.h)
 target_include_directories(theoMat PUBLIC include)
