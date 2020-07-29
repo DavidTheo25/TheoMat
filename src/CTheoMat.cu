@@ -239,7 +239,7 @@ Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
         dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
         add<<<numBlocks, blockSize>>>(matrix.mat, mat, result.mat, n, m);
         auto mes = cudaDeviceSynchronize();
-        std::cout << mes << std::endl;
+//        std::cout << mes << std::endl;
         return result;
     }
     std::string errorMessage = "cannot add matrices of different sizes (" + std::to_string(n) + ", "
@@ -260,7 +260,7 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
         dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
         sub<<<numBlocks, blockSize>>>(matrix.mat, mat, result.mat, n, m);
         auto mes = cudaDeviceSynchronize();
-        std::cout << mes << std::endl;
+//        std::cout << mes << std::endl;
         return result;
     }
     std::string errorMessage = "cannot subtract matrices of different sizes (" + std::to_string(n) + ", "
@@ -276,7 +276,7 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
         dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
         mult<<<numBlocks, blockSize>>>(mat, matrix.mat, result.mat, n, matrix.getM(), m);
         auto mes = cudaDeviceSynchronize();
-        std::cout << mes << std::endl;
+//        std::cout << mes << std::endl;
         return result;
     }
     std::string errorMessage = "cannot multiply incompatible matrices. first one has " + std::to_string(m) +
@@ -291,7 +291,7 @@ Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
     dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
     multk<<<numBlocks, blockSize>>>(result.mat, mat, k, n, m);
     auto mes = cudaDeviceSynchronize();
-    std::cout << mes << std::endl;
+//    std::cout << mes << std::endl;
     return result;
 }
 
@@ -301,7 +301,7 @@ Theo::CTheoMat Theo::CTheoMat::operator/(double k) const {
     dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
     multk<<<numBlocks, blockSize>>>(result.mat, mat, 1/k, n, m);
     auto mes = cudaDeviceSynchronize();
-    std::cout << mes << std::endl;
+//    std::cout << mes << std::endl;
     return result;
 }
 
