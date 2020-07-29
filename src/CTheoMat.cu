@@ -37,7 +37,7 @@ void mult(double** a, double** b, double** c, int n, int m){
     for (int i = index ; i < n; i += strideX) {
         for (int j = jndex; j < m; j += strideY) {
             for(int k = 0; k < m; k++){
-                c[i][j] += b[i][k] * a[k][j];
+                c[i][j] += a[i][k] * b[k][j];
             }
         }
     }
@@ -257,10 +257,10 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
 Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
     // very slow implementation ...
     if(m == matrix.getN()) {
-        CTheoMat result(n, m);
+        CTheoMat result(n, matrix.getM());
         dim3 blockSize(16, 16);
         dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
-        mult<<<numBlocks, blockSize>>>(matrix.mat, mat, result.mat, n, m);
+        mult<<<numBlocks, blockSize>>>(mat, matrix.mat, result.mat, n, m);
         auto mes = cudaDeviceSynchronize();
         std::cout << mes << std::endl;
         return result;

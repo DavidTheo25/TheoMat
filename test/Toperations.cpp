@@ -153,6 +153,10 @@ TEST(Operations, multMatOperator){
 
     auto c = a * b;
 
+    std::cout << a.toString() << std::endl << std::endl;
+    std::cout << b.toString() << std::endl << std::endl;
+    std::cout << c.toString() << std::endl << std::endl;
+
     ASSERT_TRUE(c == Theo::CTheoMat({{-4, 7}, {-5, 13}}));
 }
 
