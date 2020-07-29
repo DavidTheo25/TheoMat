@@ -56,8 +56,8 @@ target_include_directories(theoMat PUBLIC include)
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(helloTest test/Thello.cpp)
 target_link_libraries(helloTest gtest_main theoMat)
-add_test(NAME helloTest COMMAND tests/Thello.cpp)
+add_test(NAME helloTest COMMAND test/Thello.cpp)
 
 add_executable(operationTest test/Toperations.cpp)
 target_link_libraries(operationTest gtest_main theoMat)
-add_test(NAME operationTest COMMAND tests/Toperations.cpp)
+add_test(NAME operationTest COMMAND test/Toperations.cpp)

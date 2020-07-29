@@ -45,6 +45,19 @@ void mult(double** a, double** b, double** c, int n, int m, int K){
     }
 }
 
+__global__
+void multk(double** res, double** a, double k, int n, int m){
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int jndex = blockIdx.y * blockDim.y + threadIdx.y;
+    int strideX = blockDim.x * gridDim.x;
+    int strideY = blockDim.y * gridDim.y;
+    for (int i = index ; i < n; i += strideX) {
+        for (int j = jndex; j < m; j += strideY) {
+            res[i][j] = k * a[i][j];
+        }
+    }
+}
+
 void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;
 }
@@ -257,7 +270,6 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
-    // very slow implementation ...
     if(m == matrix.getN()) {
         CTheoMat result(n, matrix.getM());
         dim3 blockSize(16, 16);
@@ -275,21 +287,21 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
 
 Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
     CTheoMat result(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            result(i,j) = mat[i][j] * k;
-        }
-    }
+    dim3 blockSize(16, 16);
+    dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
+    multk<<<numBlocks, blockSize>>>(result.mat, mat, k, n, m);
+    auto mes = cudaDeviceSynchronize();
+    std::cout << mes << std::endl;
     return result;
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator/(double k) const {
     CTheoMat result(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            result(i,j) = mat[i][j] / k;
-        }
-    }
+    dim3 blockSize(16, 16);
+    dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
+    multk<<<numBlocks, blockSize>>>(result.mat, mat, 1/k, n, m);
+    auto mes = cudaDeviceSynchronize();
+    std::cout << mes << std::endl;
     return result;
 }
 
