@@ -151,10 +151,11 @@ TEST(Operations, multMatOperator){
     Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
     Theo::CTheoMat b({{1,2},{0,-1}, {-2,3}});
 
-    auto c = a * b;
-
     std::cout << a.toString() << std::endl << std::endl;
     std::cout << b.toString() << std::endl << std::endl;
+
+    auto c = a * b;
+
     std::cout << c.toString() << std::endl << std::endl;
 
     ASSERT_TRUE(c == Theo::CTheoMat({{-4, 7}, {-5, 13}}));
@@ -185,5 +186,34 @@ TEST(Operations, bigMatrixMult){
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << duration.count() << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+    Theo::CTheoMat verif(400, 400);
+    double maxError = 0;
+    for (int i = 0; i < verif.getN(); i++) {
+        for (int j = 0; j < verif.getM(); j++) {
+            double s = 0;
+            for(int k = 0; k < a.getM(); k++){
+                s += a.mat[i][k] * b.mat[k][j];
+            }
+            verif.mat[i][j] = s;
+            if(abs(verif(i,j) - res(i,j)) > maxError ){
+                maxError = abs(verif(i,j) - res(i,j));
+            }
+        }
+    }
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << duration.count() << std::endl;
+    std::cout << maxError << std::endl;
+
+//    std::cout << a.toString() << std::endl << std::endl;
+//    std::cout << b.toString() << std::endl << std::endl;
+//    std::cout << res.toString() << std::endl << std::endl;
+//    std::cout << verif.toString() << std::endl << std::endl;
+//    std::cout << (res - verif).toString() << std::endl << std::endl;
+
+
+    ASSERT_TRUE(res == verif);
 
 }

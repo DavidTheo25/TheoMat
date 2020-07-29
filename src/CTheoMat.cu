@@ -29,7 +29,7 @@ void sub(double** a, double** b, double** c, int n, int m){
 }
 
 __global__
-void mult(double** a, double** b, double** c, int n, int m){
+void mult(double** a, double** b, double** c, int n, int m, int K){
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int jndex = blockIdx.y * blockDim.y + threadIdx.y;
     int strideX = blockDim.x * gridDim.x;
@@ -37,7 +37,7 @@ void mult(double** a, double** b, double** c, int n, int m){
     for (int i = index ; i < n; i += strideX) {
         for (int j = jndex; j < m; j += strideY) {
             double s = 0;
-            for(int k = 0; k < m; k++){
+            for(int k = 0; k < K; k++){
                 s += a[i][k] * b[k][j];
             }
             c[i][j] = s;
@@ -262,7 +262,7 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
         CTheoMat result(n, matrix.getM());
         dim3 blockSize(16, 16);
         dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
-        mult<<<numBlocks, blockSize>>>(mat, matrix.mat, result.mat, n, m);
+        mult<<<numBlocks, blockSize>>>(mat, matrix.mat, result.mat, n, matrix.getM(), m);
         auto mes = cudaDeviceSynchronize();
         std::cout << mes << std::endl;
         return result;
