@@ -58,6 +58,16 @@ void multk(double** res, double** a, double k, int n, int m){
     }
 }
 
+__global__
+void copyLine(double* res, double* a, int n){
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int strideX = blockDim.x * gridDim.x;
+    for (int i = index ; i < n; i += strideX) {
+        res[i] = a[i];
+    }
+}
+
+
 void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;
 }
@@ -219,14 +229,13 @@ Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
         freeMat();
         n = matrix.getN();
         m = matrix.getM();
-//        mat = new double*[n];
         cudaMallocManaged(&mat, n * sizeof(double*));
         for (int i = 0; i < n; i++){
-//            mat[i] = new double[m];
             cudaMallocManaged(reinterpret_cast<void **>(&mat[i]), m * sizeof(double));
-            for(int j = 0; j < m; j++){
-                mat[i][j] = matrix(i, j);
-            }
+            int blockSize = 256;
+            int numBlocks = (m + blockSize - 1) / blockSize;
+            copyLine<<<numBlocks, blockSize>>>(mat[i], matrix.mat[i], m);
+            cudaDeviceSynchronize();
         }
     }
     return *this;
