@@ -1,15 +1,61 @@
-#include "CTheoMat.h"
+#include "CTheoMat.cuh"
 #include <iostream>
 #include <random>
+
+__global__
+void add(double** a, double** b, double** c, int n, int m){
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int jndex = blockIdx.y * blockDim.y + threadIdx.y;
+    int strideX = blockDim.x * gridDim.x;
+    int strideY = blockDim.y * gridDim.y;
+    for (int i = index ; i < n; i += strideX) {
+        for (int j = jndex; j < m; j += strideY) {
+            c[i][j] = a[i][j] + b[i][j];
+        }
+    }
+}
+
+__global__
+void sub(double** a, double** b, double** c, int n, int m){
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int jndex = blockIdx.y * blockDim.y + threadIdx.y;
+    int strideX = blockDim.x * gridDim.x;
+    int strideY = blockDim.y * gridDim.y;
+    for (int i = index ; i < n; i += strideX) {
+        for (int j = jndex; j < m; j += strideY) {
+            c[i][j] = a[i][j] - b[i][j];
+        }
+    }
+}
+
+__global__
+void mult(double** a, double** b, double** c, int n, int m){
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    int jndex = blockIdx.y * blockDim.y + threadIdx.y;
+    int strideX = blockDim.x * gridDim.x;
+    int strideY = blockDim.y * gridDim.y;
+    for (int i = index ; i < n; i += strideX) {
+        for (int j = jndex; j < m; j += strideY) {
+            for(int k = 0; k < m; k++){
+                c[i][j] += b[i][k] * a[k][j];
+            }
+        }
+    }
+}
 
 void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;
 }
 
 double** Theo::CTheoMat::initMat() const {
-    auto matTemp = new double*[n];
+//    auto matTemp = new double*[n];
+    double** matTemp;
+    auto devTest = cudaMallocManaged(&matTemp, n * sizeof(double*));
+//    std::cout << devTest << std::endl;
     for (int i = 0; i < n; i++){
-        matTemp[i] = new double[m];
+//        matTemp[i] = new double[m];
+        devTest = cudaMallocManaged(reinterpret_cast<void **>(&matTemp[i]), m * sizeof(double));
+//        std::cout << devTest << std::endl;
         for(int j = 0; j < m; j++){
             matTemp[i][j] = 0;
         }
@@ -95,9 +141,11 @@ Theo::CTheoMat::CTheoMat(double *values, int size): n(1), m(size), mat(initMat()
 
 void Theo::CTheoMat::freeMat() {
     for (int i = 0; i < n; i++){
-        delete[] mat[i];
+//        delete[] mat[i];
+        cudaFree(mat[i]);
     }
-    delete [] mat;
+//    delete [] mat;
+    cudaFree(mat);
 }
 
 Theo::CTheoMat::~CTheoMat() {
@@ -156,9 +204,11 @@ Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
         freeMat();
         n = matrix.getN();
         m = matrix.getM();
-        mat = new double*[n];
+//        mat = new double*[n];
+        cudaMallocManaged(&mat, n * sizeof(double*));
         for (int i = 0; i < n; i++){
-            mat[i] = new double[m];
+//            mat[i] = new double[m];
+            cudaMallocManaged(reinterpret_cast<void **>(&mat[i]), m * sizeof(double));
             for(int j = 0; j < m; j++){
                 mat[i][j] = matrix(i, j);
             }
@@ -170,11 +220,11 @@ Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
 Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
     if(checkDim(matrix)){
         CTheoMat result(n, m);
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                result.setValue(matrix.getValue(i, j) + mat[i][j], i,j);
-            }
-        }
+        dim3 blockSize(16, 16);
+        dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
+        add<<<numBlocks, blockSize>>>(matrix.mat, mat, result.mat, n, m);
+        auto mes = cudaDeviceSynchronize();
+        std::cout << mes << std::endl;
         return result;
     }
     std::string errorMessage = "cannot add matrices of different sizes (" + std::to_string(n) + ", "
@@ -191,11 +241,11 @@ Theo::CTheoMat & Theo::CTheoMat::operator+=(const Theo::CTheoMat &matrix) {
 Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
     if(checkDim(matrix)) {
         CTheoMat result(n, m);
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                result.setValue(matrix.getValue(i, j) - mat[i][j], i, j);
-            }
-        }
+        dim3 blockSize(16, 16);
+        dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
+        sub<<<numBlocks, blockSize>>>(matrix.mat, mat, result.mat, n, m);
+        auto mes = cudaDeviceSynchronize();
+        std::cout << mes << std::endl;
         return result;
     }
     std::string errorMessage = "cannot subtract matrices of different sizes (" + std::to_string(n) + ", "
@@ -207,16 +257,12 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
 Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
     // very slow implementation ...
     if(m == matrix.getN()) {
-        CTheoMat result(n, matrix.getM());
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < matrix.getM(); j++) {
-                auto s = 0;
-                for(int k = 0; k < m; k++){
-                    s += mat[i][k] * matrix(k, j);
-                }
-                result(i, j) = s;
-            }
-        }
+        CTheoMat result(n, m);
+        dim3 blockSize(16, 16);
+        dim3 numBlocks((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
+        mult<<<numBlocks, blockSize>>>(matrix.mat, mat, result.mat, n, m);
+        auto mes = cudaDeviceSynchronize();
+        std::cout << mes << std::endl;
         return result;
     }
     std::string errorMessage = "cannot multiply incompatible matrices. first one has " + std::to_string(m) +

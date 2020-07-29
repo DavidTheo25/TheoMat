@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../include/CTheoMat.h"
+#include "../include/CTheoMat.cuh"
 #include <chrono>
 
 TEST(Operations, add_operator){
@@ -134,6 +134,9 @@ TEST(Operations, multMatOperator_id){
     }
 
     auto idMat = Theo::CTheoMat::identity(m);
+
+    std::cout << idMat.toString() << std::endl;
+    std::cout << a.toString() << std::endl;
 
     auto b = a * idMat;
 

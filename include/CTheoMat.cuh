@@ -1,5 +1,5 @@
-#ifndef THEOMAT_CTHEOMAT_H
-#define THEOMAT_CTHEOMAT_H
+#ifndef THEOMAT_CTHEOMAT_CUH
+#define THEOMAT_CTHEOMAT_CUH
 
 #include <vector>
 #include <string>
@@ -18,7 +18,7 @@ namespace Theo {
         CTheoMat(double* values, int size);
         ~CTheoMat();
 
-        static CTheoMat identity(int n);
+        static CTheoMat identity(int size);
 
         void hello();
         double getValue(int i, int j) const;
@@ -45,12 +45,18 @@ namespace Theo {
 
 
     private:
+
         int n, m;
+        double** initMat() const;
+
+        void freeMat();
+
+    public:
+
         double** mat;
 
-        double** initMat() const;
-        void freeMat();
+
     };
 
 }
-#endif //THEOMAT_CTHEOMAT_H
+#endif //THEOMAT_CTHEOMAT_CUH
