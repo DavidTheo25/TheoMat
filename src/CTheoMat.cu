@@ -36,9 +36,11 @@ void mult(double** a, double** b, double** c, int n, int m){
     int strideY = blockDim.y * gridDim.y;
     for (int i = index ; i < n; i += strideX) {
         for (int j = jndex; j < m; j += strideY) {
+            double s = 0;
             for(int k = 0; k < m; k++){
-                c[i][j] += a[i][k] * b[k][j];
+                s += a[i][k] * b[k][j];
             }
+            c[i][j] = s;
         }
     }
 }
