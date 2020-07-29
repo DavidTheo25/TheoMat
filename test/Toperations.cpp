@@ -214,6 +214,6 @@ TEST(Operations, bigMatrixMult){
 //    std::cout << (res - verif).toString() << std::endl << std::endl;
 
 
-    ASSERT_TRUE(res == verif);
+    ASSERT_TRUE(maxError < 0.0000000000001);
 
 }
