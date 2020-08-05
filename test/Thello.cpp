@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../include/CTheoMat.h"
+#include "../include/CTheoMat.cuh"
 
 TEST(General, hello)
 {

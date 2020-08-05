@@ -1,5 +1,5 @@
-#ifndef THEOMAT_CTHEOMAT_H
-#define THEOMAT_CTHEOMAT_H
+#ifndef THEOMAT_CTHEOMAT_CUH
+#define THEOMAT_CTHEOMAT_CUH
 
 #include <vector>
 #include <string>
@@ -54,4 +54,4 @@ namespace Theo {
     };
 
 }
-#endif //THEOMAT_CTHEOMAT_H
+#endif //THEOMAT_CTHEOMAT_CUH
