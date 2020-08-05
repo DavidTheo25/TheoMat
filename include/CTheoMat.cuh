@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 
-
 namespace Theo {
 
     class CTheoMat {
@@ -49,8 +48,6 @@ namespace Theo {
 
 
     private:
-
-
         float* initMat() const;
         void freeMat();
     };
