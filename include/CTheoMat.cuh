@@ -31,6 +31,7 @@ namespace Theo {
         std::string toString();
         CTheoMat transpose();
         bool checkDim(const CTheoMat& matrix) const;
+        void gemm(float alpha, const CTheoMat& a, const CTheoMat& b, float beta, CTheoMat& c) const;
 
         CTheoMat & operator=(const CTheoMat& matrix);
         CTheoMat operator+(const CTheoMat& matrix);

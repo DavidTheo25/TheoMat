@@ -147,6 +147,43 @@ bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) const {
     return rows == matrix.getRows() && columns == matrix.getColumns();
 }
 
+void Theo::CTheoMat::gemm(float alpha, const Theo::CTheoMat &a, const Theo::CTheoMat &b, float beta, Theo::CTheoMat& c) const {
+    int M = a.getRows();
+    int N = b.getColumns();
+    int K = a.getColumns();
+    // Pre-calculate the size (in bytes) of our matrices
+    const size_t bytes_a = M * K * sizeof(float);
+    const size_t bytes_b = K * N * sizeof(float);
+    const size_t bytes_c = M * N * sizeof(float);
+
+    // Allocate device memory
+    float *d_a, *d_b, *d_c;
+    cudaMalloc(&d_a, bytes_a);
+    cudaMalloc(&d_b, bytes_b);
+    cudaMalloc(&d_c, bytes_c);
+
+    cudaMemcpy(d_a, a.mat, bytes_a, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b.mat, bytes_b, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_c, c.mat, bytes_c, cudaMemcpyHostToDevice);
+
+    // cuBLAS handle
+    cublasHandle_t handle;
+    cublasCreate(&handle);
+
+    // Calculate: c = (alpha*a) * b + (beta*c)
+    // MxN = MxK * KxN
+    // Signature: handle, operation, operation, M, N, K, alpha, A, lda, B, ldb,
+    // beta, C, ldc
+    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K, &alpha, d_a, M, d_b, K,
+                &beta, d_c, M);
+
+    cudaMemcpy(c.mat, d_c, bytes_c, cudaMemcpyDeviceToHost);
+
+    cudaFree(d_a);
+    cudaFree(d_b);
+    cudaFree(d_c);
+}
+
 Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
     if(this != &matrix){
         freeMat();
@@ -198,45 +235,10 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
     // very slow implementation ...
     int M = rows;
     int N = matrix.getColumns();
-    int K = columns;
     if(columns == matrix.getRows()) {
         CTheoMat result(M, N);
 
-        // Pre-calculate the size (in bytes) of our matrices
-        const size_t bytes_a = M * K * sizeof(float);
-        const size_t bytes_b = K * N * sizeof(float);
-        const size_t bytes_c = M * N * sizeof(float);
-
-        // Allocate device memory
-        float *d_a, *d_b, *d_c;
-        cudaMalloc(&d_a, bytes_a);
-        cudaMalloc(&d_b, bytes_b);
-        cudaMalloc(&d_c, bytes_c);
-
-        cudaMemcpy(d_a, mat, bytes_a, cudaMemcpyHostToDevice);
-        cudaMemcpy(d_b, matrix.mat, bytes_b, cudaMemcpyHostToDevice);
-        cudaMemcpy(d_c, result.mat, bytes_c, cudaMemcpyHostToDevice);
-
-        // cuBLAS handle
-        cublasHandle_t handle;
-        cublasCreate(&handle);
-
-        // Scalaing factors
-        float alpha = 1.0f;
-        float beta = 0.0f;
-
-        // Calculate: c = (alpha*a) * b + (beta*c)
-        // MxN = MxK * KxN
-        // Signature: handle, operation, operation, M, N, K, alpha, A, lda, B, ldb,
-        // beta, C, ldc
-        cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K, &alpha, d_a, M, d_b, K,
-                    &beta, d_c, M);
-
-        cudaMemcpy(result.mat, d_c, bytes_c, cudaMemcpyDeviceToHost);
-
-        cudaFree(d_a);
-        cudaFree(d_b);
-        cudaFree(d_c);
+        gemm(1.0f, *this, matrix, 0.0f, result);
 
         return result;
 
