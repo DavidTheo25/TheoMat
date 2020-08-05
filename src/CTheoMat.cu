@@ -1,6 +1,8 @@
-#include "CTheoMat.h"
+#include "CTheoMat.cuh"
 #include <iostream>
 #include <random>
+#include <cublas_v2.h>
+
 
 void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;

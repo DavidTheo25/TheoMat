@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../include/CTheoMat.h"
+#include "../include/CTheoMat.cuh"
 #include <chrono>
 
 TEST(Operations, add_operator){
@@ -168,7 +168,7 @@ TEST(Operations, bigMatrixMult){
     auto start = std::chrono::high_resolution_clock::now();
     auto res = a * b;
     auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = duration_cast<std::chrono::microseconds>(stop - start);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << duration.count() << std::endl;
 
 }

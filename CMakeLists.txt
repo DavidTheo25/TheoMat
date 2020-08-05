@@ -1,12 +1,7 @@
-cmake_minimum_required(VERSION 3.1...3.16)
+cmake_minimum_required(VERSION 3.16)
 project(theoMat VERSION 1.0
-                DESCRIPTION "Basic matrix library with few operations"
-                LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 20)
-
-add_library(theoMat SHARED src/CTheoMat.cpp include/CTheoMat.h)
-target_include_directories(theoMat PUBLIC include)
+        DESCRIPTION "Basic matrix library with few operations"
+        LANGUAGES CUDA CXX)
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -40,11 +35,30 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
+
+set(CMAKE_CUDA_STANDARD 14)
+set(CMAKE_CXX_COMPILER /usr/bin/g++-8)
+set(CMAKE_C_COMPILER /usr/bin/gcc-8)
+#set(CMAKE_CUDA_COMPILER /usr/lib/cuda/bin/nvcc)
+
+set(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ccbin ${CMAKE_CXX_COMPILER}")
+
+add_library(theoMat SHARED src/CTheoMat.cu include/CTheoMat.cuh)
+
+set_target_properties(
+        theoMat
+        PROPERTIES
+        CUDA_SEPARABLE_COMPILATION ON)
+
+target_link_libraries(theoMat cublas)
+target_include_directories(theoMat PUBLIC include)
+
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(helloTest test/Thello.cpp)
 target_link_libraries(helloTest gtest_main theoMat)
-add_test(NAME helloTest COMMAND tests/Thello.cpp)
+add_test(NAME helloTest COMMAND test/Thello.cpp)
 
 add_executable(operationTest test/Toperations.cpp)
-target_link_libraries(operationTest gtest_main theoMat)
-add_test(NAME operationTest COMMAND tests/Toperations.cpp)
+target_link_libraries(operationTest gtest_main theoMat cublas)
+add_test(NAME operationTest COMMAND test/Toperations.cpp)
