@@ -20,7 +20,7 @@ Theo::CTheoMat::CTheoMat(): rows(0), columns(0), mat(initMat()) {}
 
 Theo::CTheoMat::CTheoMat(int rows_, int columns_): rows(rows_), columns(columns_), mat(initMat()) {}
 
-Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): rows(matrix.getN()), columns(matrix.getM()), mat(initMat()) {
+Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): rows(matrix.getRows()), columns(matrix.getColumns()), mat(initMat()) {
     // deep copy, maybe not the best way to do it
     for(int i = 0; i < rows * columns; i++){
         mat[i] = matrix[i];
@@ -28,16 +28,16 @@ Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): rows(matrix.getN()), col
 }
 
 Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> initList) {
-    rows = initList.size();
-    columns = initList.begin()->size();
+    columns = initList.size();
+    rows = initList.begin()->size();
     mat = initMat();
     int i = 0, j = 0;
-    for(auto & row : initList) {
-        if(row.size() != columns) {
+    for(auto & column : initList) {
+        if(column.size() != rows) {
             throw std::out_of_range("invalid initialisation list size");
         }
-        for(auto & value : row){
-            mat[i * columns + j] = value;
+        for(auto & value : column){
+            mat[i * rows + j] = value;
             j++;
         }
         j = 0;
@@ -46,16 +46,16 @@ Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> in
 }
 
 Theo::CTheoMat::CTheoMat(std::vector<std::vector<double>> initVec) {
-    rows = initVec.size();
-    columns = initVec.begin()->size();
+    columns = initVec.size();
+    rows = initVec.begin()->size();
     mat = initMat();
     int i = 0, j = 0;
-    for(auto & row : initVec) {
-        if(row.size() != columns) {
-            throw std::out_of_range("invalid initialisation vector size");
+    for(auto & column : initVec) {
+        if(column.size() != rows) {
+            throw std::out_of_range("invalid initialisation list size");
         }
-        for(auto & value : row){
-            mat[i * columns + j] = value;
+        for(auto & value : column){
+            mat[i * rows + j] = value;
             j++;
         }
         j = 0;
@@ -68,8 +68,8 @@ Theo::CTheoMat::CTheoMat(std::vector<std::vector<double>> initVec) {
  * @param initVect
  */
 Theo::CTheoMat::CTheoMat(std::vector<double> initVect) {
-    rows = 1;
-    columns = initVect.size();
+    columns = 1;
+    rows = initVect.size();
     mat = initMat();
     int i = 0;
     for(auto & value : initVect){
@@ -83,7 +83,7 @@ Theo::CTheoMat::CTheoMat(std::vector<double> initVect) {
  * @param values
  * @param size
  */
-Theo::CTheoMat::CTheoMat(double *values, int size): rows(1), columns(size), mat(initMat()){
+Theo::CTheoMat::CTheoMat(double *values, int size): rows(size), columns(1), mat(initMat()){
     for(int i = 0; i < columns; i++){
         mat[i] = values[i];
     }
@@ -99,19 +99,20 @@ Theo::CTheoMat::~CTheoMat() {
 }
 
 double Theo::CTheoMat::getValue(int i, int j) const {
-    if(i >= 0 && i < rows && j >= 0 && j < columns) {
-        return (double) mat[i * columns + j];
+    if(i >= 0 && i < columns && j >= 0 && j < rows) {
+        return (double) mat[i * rows + j];
     }
     throw std::out_of_range("i and/or j out of matrix range");
 }
 
 void Theo::CTheoMat::setValue(double value, int i, int j) {
-    if(i >= 0 && i < rows && j >= 0 && j < columns){
-        mat[i * columns + j] = value;
+    if(i >= 0 && i < columns && j >= 0 && j < rows){
+        mat[i * rows + j] = value;
     }
 }
 
 void Theo::CTheoMat::random() {
+    //this could be done with curand
     std::random_device r;
     std::default_random_engine e1(r());
     std::uniform_real_distribution<double> uniformDist(0,1);
@@ -120,34 +121,34 @@ void Theo::CTheoMat::random() {
     }
 }
 
-int Theo::CTheoMat::getN() const {return rows;}
+int Theo::CTheoMat::getRows() const {return rows;}
 
-int Theo::CTheoMat::getM() const {return columns;}
+int Theo::CTheoMat::getColumns() const {return columns;}
 
 std::string Theo::CTheoMat::toString() {
     std::string s = "[";
-    for(int i = 0; i < rows; i++){
+    for (int j = 0; j < rows; j++){
         s += "[";
-        for(int j = 0; j < columns - 1; j++){
-            s += std::to_string(mat[i * columns + j]); s += ", ";
+        for (int i = 0; i < columns - 1; i++){
+            s += std::to_string(mat[i * rows + j]) + ", ";
         }
-        s += std::to_string(mat[i * columns + columns - 1]);
-        s += "]";
-        if(i != rows - 1){ s += "\n";}
+        s += std::to_string(mat[(columns - 1) * rows + j]);
+        s += "]\n";
     }
-    s += "]";
+    s.pop_back();
+    s += "]\n";
     return s;
 }
 
 bool Theo::CTheoMat::checkDim(const Theo::CTheoMat &matrix) const {
-    return rows == matrix.getN() && columns == matrix.getM();
+    return rows == matrix.getRows() && columns == matrix.getColumns();
 }
 
 Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
     if(this != &matrix){
         freeMat();
-        rows = matrix.getN();
-        columns = matrix.getM();
+        rows = matrix.getRows();
+        columns = matrix.getColumns();
         mat = new double[rows * columns];
         for (int i = 0; i < rows * columns; i++){
             mat[i] = matrix[i];
@@ -165,8 +166,8 @@ Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
         return result;
     }
     std::string errorMessage = "cannot add matrices of different sizes (" + std::to_string(rows) + ", "
-                               + std::to_string(columns) + ") and (" + std::to_string(matrix.getN()) + ", "
-                               + std::to_string(matrix.getM()) + ")\n";
+                               + std::to_string(columns) + ") and (" + std::to_string(matrix.getRows()) + ", "
+                               + std::to_string(matrix.getColumns()) + ")\n";
     throw std::out_of_range(errorMessage);
 }
 
@@ -184,28 +185,31 @@ Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
         return result;
     }
     std::string errorMessage = "cannot subtract matrices of different sizes (" + std::to_string(rows) + ", "
-                               + std::to_string(columns) + ") and (" + std::to_string(matrix.getN()) + ", "
-                               + std::to_string(matrix.getM()) + ")\n";
+                               + std::to_string(columns) + ") and (" + std::to_string(matrix.getRows()) + ", "
+                               + std::to_string(matrix.getColumns()) + ")\n";
     throw std::out_of_range(errorMessage);
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
     // very slow implementation ...
-    if(columns == matrix.getN()) {
-        CTheoMat result(rows, matrix.getM());
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < matrix.getM(); j++) {
+    int M = rows;
+    int N = matrix.getColumns();
+    int K = columns;
+    if(columns == matrix.getRows()) {
+        CTheoMat result(M, N);
+        for (int row = 0; row < M; row++) {
+            for (int col = 0; col < N; col++) {
                 auto s = 0;
-                for(int k = 0; k < columns; k++){
-                    s += mat[i * columns + k] * matrix(k, j);
+                for(int i = 0; i < K; i++){
+                    s += mat[row * K + i] * matrix(i, col);
                 }
-                result(i, j) = s;
+                result(row, col) = s;
             }
         }
         return result;
     }
     std::string errorMessage = "cannot multiply incompatible matrices. first one has " + std::to_string(columns) +
-                               " columns while second one has " + std::to_string(matrix.getN()) + " rows \n";
+                               " columns while second one has " + std::to_string(matrix.getRows()) + " rows \n";
     throw std::out_of_range(errorMessage);
 
 }
@@ -241,21 +245,21 @@ double& Theo::CTheoMat::operator[](int& i) const {
 }
 
 double &Theo::CTheoMat::operator()(int i, int j) {
-    if(i >= 0 && i < rows && j >= 0 && j < columns) {
-        return mat[i * columns + j];
+    if(i >= 0 && i < columns && j >= 0 && j < rows) {
+        return mat[i * rows + j];
     }
     throw std::out_of_range("i or j is out of the matrix range");
 }
 
 double &Theo::CTheoMat::operator()(int &i, int &j) const {
-    if(i >= 0 && i < rows && j >= 0 && j < columns) {
-        return mat[i * columns + j];
+    if(i >= 0 && i < columns && j >= 0 && j < rows) {
+        return mat[i * rows + j];
     }
     throw std::out_of_range("i or j is out of the matrix range");
 }
 
 bool Theo::CTheoMat::operator==(const Theo::CTheoMat &matrix) const {
-    if(rows != matrix.getN() || columns != matrix.getM()){
+    if(rows != matrix.getRows() || columns != matrix.getColumns()){
         return false;
     }
     for(int i = 0; i < rows * columns; i++){
@@ -268,9 +272,9 @@ bool Theo::CTheoMat::operator==(const Theo::CTheoMat &matrix) const {
 
 Theo::CTheoMat Theo::CTheoMat::transpose() {
     CTheoMat transpose(columns, rows);
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < columns; j++){
-            transpose(j, i) = mat[i * columns + j];
+    for(int i = 0; i < columns; i++){
+        for(int j = 0; j < rows; j++){
+            transpose(j, i) = mat[i * rows + j];
         }
     }
     return transpose;

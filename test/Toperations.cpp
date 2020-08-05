@@ -6,8 +6,8 @@ TEST(Operations, add_operator){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             a(i, j) = (double) i + j;
         }
     }
@@ -20,8 +20,8 @@ TEST(Operations, add_operator){
 //    std::cout << b.toString() << std::endl;
 //    std::cout << c.toString() << std::endl;
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             ASSERT_EQ(c(i, j), a(i, j) + b(i, j));
         }
     }
@@ -31,8 +31,8 @@ TEST(Operations, sub_operator){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             a(i, j) = (double) i + j;
         }
     }
@@ -45,8 +45,8 @@ TEST(Operations, sub_operator){
 //    std::cout << b.toString() << std::endl;
 //    std::cout << c.toString() << std::endl;
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             ASSERT_EQ(c(i, j), a(i, j) - b(i, j));
         }
     }
@@ -56,16 +56,16 @@ TEST(Operations, transpose){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             a(i, j) = (double) i + j;
         }
     }
 
     auto b = a.transpose();
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             ASSERT_EQ(a(i, j), b(j, i));
         }
     }
@@ -78,8 +78,8 @@ TEST(Operations, multKOperator){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             a(i, j) = (double) i + j;
         }
     }
@@ -91,8 +91,8 @@ TEST(Operations, multKOperator){
 //    std::cout << a.toString() << std::endl;
 //    std::cout << b.toString() << std::endl;
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             ASSERT_EQ(b(i, j), a(i, j) * k * k);
         }
     }
@@ -102,8 +102,8 @@ TEST(Operations, divideOperator){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             a(i, j) = (double) i + j;
         }
     }
@@ -113,8 +113,8 @@ TEST(Operations, divideOperator){
     auto b =  a / k;
 
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             ASSERT_EQ(b(i, j), a(i, j) / k);
         }
     }
@@ -147,6 +147,9 @@ TEST(Operations, multMatOperator_id){
 TEST(Operations, multMatOperator){
     Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
     Theo::CTheoMat b({{1,2},{0,-1}, {-2,3}});
+
+    std::cout << a.toString() << std::endl;
+    std::cout << b.toString() << std::endl;
 
     auto c = a * b;
 

@@ -10,7 +10,7 @@ namespace Theo {
     class CTheoMat {
     public:
         CTheoMat();
-        CTheoMat(int n, int m);
+        CTheoMat(int rows_, int columns_);
         CTheoMat(const CTheoMat& matrix);
         CTheoMat(std::initializer_list<std::initializer_list<double>> initList);
         CTheoMat(std::vector<std::vector<double>> initList);
@@ -24,8 +24,8 @@ namespace Theo {
         double getValue(int i, int j) const;
         void setValue(double value, int i, int j);
         void random();
-        int getN() const;
-        int getM() const;
+        int getRows() const;
+        int getColumns() const;
         std::string toString();
         CTheoMat transpose();
         bool checkDim(const CTheoMat& matrix) const;

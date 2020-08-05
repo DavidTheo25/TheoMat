@@ -8,19 +8,19 @@ TEST(General, hello)
 }
 
 TEST(General, set_and_get_values){
-    int n = 2;
-    int m = 3;
-    Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    int rows = 2;
+    int columns = 3;
+    Theo::CTheoMat a(rows, columns);
+    for(int i = 0; i < columns; i++){
+        for(int j = 0; j < rows; j++){
             a.setValue((double) i+j, i, j);
         }
     }
 
     std::cout << a.toString() << std::endl;
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < columns; i++){
+        for(int j = 0; j < rows; j++){
             ASSERT_EQ(a.getValue(i, j), i+j);
         }
     }
@@ -30,8 +30,8 @@ TEST(General, copy_ctor){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             a.setValue((double) i+j, i, j);
         }
     }
@@ -40,8 +40,8 @@ TEST(General, copy_ctor){
 
     std::cout << b.toString() << std::endl;
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
             ASSERT_EQ(a.getValue(i, j), b.getValue(i, j));
         }
     }
@@ -49,7 +49,8 @@ TEST(General, copy_ctor){
 
 TEST(General, initializerListCtor){
     Theo::CTheoMat a({{1,2,3},{3,4,5}});
-    Theo::CTheoMat b(2,3);
+    Theo::CTheoMat b(3,2);
+    std::cout << a.toString() << std::endl;
     b(0,0) = 1; b(0, 1) = 2; b(0, 2) = 3;
     b(1,0) = 3; b(1, 1) = 4; b(1, 2) = 5;
     ASSERT_TRUE(a == b);
