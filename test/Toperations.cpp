@@ -8,7 +8,7 @@ TEST(Operations, add_operator){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            a(i, j) = (double) i + j;
+            a(i, j) = (float) i + j;
         }
     }
 
@@ -33,7 +33,7 @@ TEST(Operations, sub_operator){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            a(i, j) = (double) i + j;
+            a(i, j) = (float) i + j;
         }
     }
 
@@ -58,7 +58,7 @@ TEST(Operations, transpose){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            a(i, j) = (double) i + j;
+            a(i, j) = (float) i + j;
         }
     }
 
@@ -80,11 +80,11 @@ TEST(Operations, multKOperator){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            a(i, j) = (double) i + j;
+            a(i, j) = (float) i + j;
         }
     }
 
-    double k = 2.8;
+    float k = 2.8;
 
     auto b =  k * a * k;
 
@@ -104,11 +104,11 @@ TEST(Operations, divideOperator){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            a(i, j) = (double) i + j;
+            a(i, j) = (float) i + j;
         }
     }
 
-    double k = 2.8;
+    float k = 2.8;
 
     auto b =  a / k;
 
@@ -127,9 +127,9 @@ TEST(Operations, multMatOperator_id){
     int n = 2;
     int m = 3;
     Theo::CTheoMat a(n, m);
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            a(i, j) = (double) i + j;
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
+            a(i, j) = (float) i + j;
         }
     }
 
@@ -153,7 +153,9 @@ TEST(Operations, multMatOperator){
 
     auto c = a * b;
 
-    ASSERT_TRUE(c == Theo::CTheoMat({{-4, 7}, {-5, 13}}));
+    std::cout << c.toString() << std::endl;
+
+    ASSERT_TRUE(c == Theo::CTheoMat({{2, -5, 8}, {-1, 2, -3}, {3, -4, 5}}));
 }
 
 TEST(Operations, random){
@@ -173,5 +175,7 @@ TEST(Operations, bigMatrixMult){
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << duration.count() << std::endl;
+
+
 
 }

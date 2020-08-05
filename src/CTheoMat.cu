@@ -8,8 +8,10 @@ void Theo::CTheoMat::hello() {
     std::cout << "Hello I am the theo's custom matrix library, WIP" << std::endl;
 }
 
-double* Theo::CTheoMat::initMat() const {
-    auto matTemp = new double[rows * columns];
+float* Theo::CTheoMat::initMat() const {
+    auto matTemp = new float[rows * columns];
+//    float* matTemp;
+//    cudaMallocManaged(&matTemp, rows * columns * sizeof(float));
     for (int i = 0; i < rows * columns ; i++){
             matTemp[i] = 0;
     }
@@ -27,7 +29,7 @@ Theo::CTheoMat::CTheoMat(const Theo::CTheoMat& matrix): rows(matrix.getRows()), 
     }
 }
 
-Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> initList) {
+Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<float>> initList) {
     columns = initList.size();
     rows = initList.begin()->size();
     mat = initMat();
@@ -45,7 +47,7 @@ Theo::CTheoMat::CTheoMat(std::initializer_list<std::initializer_list<double>> in
     }
 }
 
-Theo::CTheoMat::CTheoMat(std::vector<std::vector<double>> initVec) {
+Theo::CTheoMat::CTheoMat(std::vector<std::vector<float>> initVec) {
     columns = initVec.size();
     rows = initVec.begin()->size();
     mat = initMat();
@@ -67,7 +69,7 @@ Theo::CTheoMat::CTheoMat(std::vector<std::vector<double>> initVec) {
  * Creates a one line matrix with the given vector
  * @param initVect
  */
-Theo::CTheoMat::CTheoMat(std::vector<double> initVect) {
+Theo::CTheoMat::CTheoMat(std::vector<float> initVect) {
     columns = 1;
     rows = initVect.size();
     mat = initMat();
@@ -83,7 +85,7 @@ Theo::CTheoMat::CTheoMat(std::vector<double> initVect) {
  * @param values
  * @param size
  */
-Theo::CTheoMat::CTheoMat(double *values, int size): rows(size), columns(1), mat(initMat()){
+Theo::CTheoMat::CTheoMat(float *values, int size): rows(size), columns(1), mat(initMat()){
     for(int i = 0; i < columns; i++){
         mat[i] = values[i];
     }
@@ -92,20 +94,21 @@ Theo::CTheoMat::CTheoMat(double *values, int size): rows(size), columns(1), mat(
 
 void Theo::CTheoMat::freeMat() {
     delete [] mat;
+//    cudaFree(mat);
 }
 
 Theo::CTheoMat::~CTheoMat() {
     freeMat();
 }
 
-double Theo::CTheoMat::getValue(int i, int j) const {
+float Theo::CTheoMat::getValue(int i, int j) const {
     if(i >= 0 && i < columns && j >= 0 && j < rows) {
-        return (double) mat[i * rows + j];
+        return (float) mat[i * rows + j];
     }
     throw std::out_of_range("i and/or j out of matrix range");
 }
 
-void Theo::CTheoMat::setValue(double value, int i, int j) {
+void Theo::CTheoMat::setValue(float value, int i, int j) {
     if(i >= 0 && i < columns && j >= 0 && j < rows){
         mat[i * rows + j] = value;
     }
@@ -115,7 +118,7 @@ void Theo::CTheoMat::random() {
     //this could be done with curand
     std::random_device r;
     std::default_random_engine e1(r());
-    std::uniform_real_distribution<double> uniformDist(0,1);
+    std::uniform_real_distribution<float> uniformDist(0,1);
     for(int i = 0; i < rows * columns; i++){
         mat[i] = uniformDist(e1);
     }
@@ -149,7 +152,8 @@ Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
         freeMat();
         rows = matrix.getRows();
         columns = matrix.getColumns();
-        mat = new double[rows * columns];
+        mat = new float[rows * columns];
+//        cudaMallocManaged(&mat, rows * columns * sizeof(float));
         for (int i = 0; i < rows * columns; i++){
             mat[i] = matrix[i];
         }
@@ -197,16 +201,45 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
     int K = columns;
     if(columns == matrix.getRows()) {
         CTheoMat result(M, N);
-        for (int row = 0; row < M; row++) {
-            for (int col = 0; col < N; col++) {
-                auto s = 0;
-                for(int i = 0; i < K; i++){
-                    s += mat[row * K + i] * matrix(i, col);
-                }
-                result(row, col) = s;
-            }
-        }
+
+        // Pre-calculate the size (in bytes) of our matrices
+        const size_t bytes_a = M * K * sizeof(float);
+        const size_t bytes_b = K * N * sizeof(float);
+        const size_t bytes_c = M * N * sizeof(float);
+
+        // Allocate device memory
+        float *d_a, *d_b, *d_c;
+        cudaMalloc(&d_a, bytes_a);
+        cudaMalloc(&d_b, bytes_b);
+        cudaMalloc(&d_c, bytes_c);
+
+        cudaMemcpy(d_a, mat, bytes_a, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_b, matrix.mat, bytes_b, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_c, result.mat, bytes_c, cudaMemcpyHostToDevice);
+
+        // cuBLAS handle
+        cublasHandle_t handle;
+        cublasCreate(&handle);
+
+        // Scalaing factors
+        float alpha = 1.0f;
+        float beta = 0.0f;
+
+        // Calculate: c = (alpha*a) * b + (beta*c)
+        // MxN = MxK * KxN
+        // Signature: handle, operation, operation, M, N, K, alpha, A, lda, B, ldb,
+        // beta, C, ldc
+        cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, M, N, K, &alpha, d_a, M, d_b, K,
+                    &beta, d_c, M);
+
+        cudaMemcpy(result.mat, d_c, bytes_c, cudaMemcpyDeviceToHost);
+
+        cudaFree(d_a);
+        cudaFree(d_b);
+        cudaFree(d_c);
+
         return result;
+
     }
     std::string errorMessage = "cannot multiply incompatible matrices. first one has " + std::to_string(columns) +
                                " columns while second one has " + std::to_string(matrix.getRows()) + " rows \n";
@@ -214,7 +247,7 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
 
 }
 
-Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
+Theo::CTheoMat Theo::CTheoMat::operator*(float k) const {
     CTheoMat result(rows, columns);
     for(int i = 0; i < rows * columns; i++){
             result[i] = mat[i] * k;
@@ -222,7 +255,7 @@ Theo::CTheoMat Theo::CTheoMat::operator*(double k) const {
     return result;
 }
 
-Theo::CTheoMat Theo::CTheoMat::operator/(double k) const {
+Theo::CTheoMat Theo::CTheoMat::operator/(float k) const {
     CTheoMat result(rows, columns);
     for(int i = 0; i < rows * columns; i++){
         result[i] = mat[i] / k;
@@ -230,28 +263,28 @@ Theo::CTheoMat Theo::CTheoMat::operator/(double k) const {
     return result;
 }
 
-double& Theo::CTheoMat::operator[](int i) {
+float& Theo::CTheoMat::operator[](int i) {
     if(i >= rows * columns){
         throw std::out_of_range("out of matrix range");
     }
     return mat[i];
 }
 
-double& Theo::CTheoMat::operator[](int& i) const {
+float& Theo::CTheoMat::operator[](int& i) const {
     if(i >= rows * columns){
         throw std::out_of_range("out of matrix range");
     }
     return mat[i];
 }
 
-double &Theo::CTheoMat::operator()(int i, int j) {
+float &Theo::CTheoMat::operator()(int i, int j) {
     if(i >= 0 && i < columns && j >= 0 && j < rows) {
         return mat[i * rows + j];
     }
     throw std::out_of_range("i or j is out of the matrix range");
 }
 
-double &Theo::CTheoMat::operator()(int &i, int &j) const {
+float &Theo::CTheoMat::operator()(int &i, int &j) const {
     if(i >= 0 && i < columns && j >= 0 && j < rows) {
         return mat[i * rows + j];
     }
@@ -288,6 +321,6 @@ Theo::CTheoMat Theo::CTheoMat::identity(int size) {
     return id;
 }
 
-Theo::CTheoMat Theo::operator*(const double k, const Theo::CTheoMat &matrix) {
+Theo::CTheoMat Theo::operator*(const float k, const Theo::CTheoMat &matrix) {
     return matrix * k;
 }

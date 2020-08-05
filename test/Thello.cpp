@@ -13,7 +13,7 @@ TEST(General, set_and_get_values){
     Theo::CTheoMat a(rows, columns);
     for(int i = 0; i < columns; i++){
         for(int j = 0; j < rows; j++){
-            a.setValue((double) i+j, i, j);
+            a.setValue((float) i+j, i, j);
         }
     }
 
@@ -32,7 +32,7 @@ TEST(General, copy_ctor){
     Theo::CTheoMat a(n, m);
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            a.setValue((double) i+j, i, j);
+            a.setValue((float) i+j, i, j);
         }
     }
 
@@ -57,6 +57,6 @@ TEST(General, initializerListCtor){
 }
 
 TEST(General, vecCtor){
-    std::vector<double> foo = {0, 1, 2};
+    std::vector<float> foo = {0, 1, 2};
     ASSERT_TRUE(Theo::CTheoMat({0,1,2}) == Theo::CTheoMat({0,1,2}));
 }
