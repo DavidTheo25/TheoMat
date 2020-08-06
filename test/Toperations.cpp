@@ -118,9 +118,9 @@ TEST(Operations, divideOperator){
             ASSERT_EQ(b(i, j), a(i, j) / k);
         }
     }
-    std::cout << a.toString() << std::endl;
+//    std::cout << a.toString() << std::endl;
     a = a / 1.0;
-    std::cout << a.toString() << std::endl;
+//    std::cout << a.toString() << std::endl;
 }
 
 TEST(Operations, multMatOperator_id){
@@ -148,12 +148,12 @@ TEST(Operations, multMatOperator){
     Theo::CTheoMat a({{0, -1, 2}, {1, -2, 3}});
     Theo::CTheoMat b({{1,2},{0,-1}, {-2,3}});
 
-    std::cout << a.toString() << std::endl;
-    std::cout << b.toString() << std::endl;
+//    std::cout << a.toString() << std::endl;
+//    std::cout << b.toString() << std::endl;
 
     auto c = a * b;
 
-    std::cout << c.toString() << std::endl;
+//    std::cout << c.toString() << std::endl;
 
     ASSERT_TRUE(c == Theo::CTheoMat({{2, -5, 8}, {-1, 2, -3}, {3, -4, 5}}));
 }
@@ -174,8 +174,8 @@ TEST(Operations, bigMatrixMult){
     auto res = a * b;
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
-
+//    std::cout << duration.count() << std::endl;
+//    std::cout << a(354,289) << std::endl;
 
 
 }

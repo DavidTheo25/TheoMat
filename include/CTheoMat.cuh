@@ -32,6 +32,7 @@ namespace Theo {
         CTheoMat transpose();
         bool checkDim(const CTheoMat& matrix) const;
         void gemm(float alpha, const CTheoMat& a, const CTheoMat& b, float beta, CTheoMat& c) const;
+        void geam(float alpha, const CTheoMat &a, float beta, const CTheoMat &b, CTheoMat &c) const;
 
         CTheoMat & operator=(const CTheoMat& matrix);
         CTheoMat operator+(const CTheoMat& matrix);

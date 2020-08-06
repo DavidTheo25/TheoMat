@@ -184,6 +184,36 @@ void Theo::CTheoMat::gemm(float alpha, const Theo::CTheoMat &a, const Theo::CThe
     cudaFree(d_c);
 }
 
+void Theo::CTheoMat::geam(float alpha, const CTheoMat& a, float beta, const CTheoMat& b, CTheoMat& c) const {
+    // matrices here need to have the same size ... Use carefully ;)
+    int m = a.getRows();
+    int n = a.getColumns();
+    // Pre-calculate the size (in bytes) of our matrices
+    const size_t bytesMat = m * n * sizeof(float);
+
+    // Allocate device memory
+    float *d_a, *d_b, *d_c;
+    cudaMalloc(&d_a, bytesMat);
+    cudaMalloc(&d_b, bytesMat);
+    cudaMalloc(&d_c, bytesMat);
+
+    cudaMemcpy(d_a, a.mat, bytesMat, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b.mat, bytesMat, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_c, c.mat, bytesMat, cudaMemcpyHostToDevice);
+
+    // cuBLAS handle
+    cublasHandle_t handle;
+    cublasCreate(&handle);
+
+    cublasSgeam(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, &alpha, d_a, m, &beta, d_b, m, d_c, m);
+
+    cudaMemcpy(c.mat, d_c, bytesMat, cudaMemcpyDeviceToHost);
+
+    cudaFree(d_a);
+    cudaFree(d_b);
+    cudaFree(d_c);
+}
+
 Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
     if(this != &matrix){
         freeMat();
@@ -201,9 +231,7 @@ Theo::CTheoMat & Theo::CTheoMat::operator=(const Theo::CTheoMat &matrix) {
 Theo::CTheoMat Theo::CTheoMat::operator+(const Theo::CTheoMat& matrix) {
     if(checkDim(matrix)){
         CTheoMat result(rows, columns);
-        for(int i = 0; i < rows * columns; i++){
-            result[i] = mat[i] + matrix[i];
-        }
+        geam(1.0f, *this, 1.0f, matrix, result);
         return result;
     }
     std::string errorMessage = "cannot add matrices of different sizes (" + std::to_string(rows) + ", "
@@ -220,9 +248,7 @@ Theo::CTheoMat & Theo::CTheoMat::operator+=(const Theo::CTheoMat &matrix) {
 Theo::CTheoMat Theo::CTheoMat::operator-(const Theo::CTheoMat& matrix) {
     if(checkDim(matrix)) {
         CTheoMat result(rows, columns);
-        for (int i = 0; i < rows * columns; i++) {
-            result[i] = mat[i] - matrix[i];
-        }
+        geam(1.0f, *this, -1.0f, matrix, result);
         return result;
     }
     std::string errorMessage = "cannot subtract matrices of different sizes (" + std::to_string(rows) + ", "
@@ -251,17 +277,13 @@ Theo::CTheoMat Theo::CTheoMat::operator*(const Theo::CTheoMat &matrix) const {
 
 Theo::CTheoMat Theo::CTheoMat::operator*(float k) const {
     CTheoMat result(rows, columns);
-    for(int i = 0; i < rows * columns; i++){
-            result[i] = mat[i] * k;
-    }
+    geam(k, *this, 0.f, *this, result);
     return result;
 }
 
 Theo::CTheoMat Theo::CTheoMat::operator/(float k) const {
     CTheoMat result(rows, columns);
-    for(int i = 0; i < rows * columns; i++){
-        result[i] = mat[i] / k;
-    }
+    geam(1/k, *this, 0.f, *this, result);
     return result;
 }
 
